@@ -1,0 +1,63 @@
+services:
+  skywalking-oap:
+    image: ${OAP_IMAGE}
+    container_name: skywalking-oap
+    depends_on:
+      - mysql
+    links:
+      - mysql
+    ports:
+      - "11800:11800"
+      - "12800:12800"
+    healthcheck:
+      test: [ "CMD-SHELL", "/skywalking/bin/swctl ch" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    environment:
+      SW_STORAGE: mysql
+      SW_STORAGE_MYSQL_URL: jdbc:mysql://mysql:3306/skywalking
+      SW_STORAGE_MYSQL_USERNAME: ${MYSQL_USER}
+      SW_STORAGE_MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      SW_HEALTH_CHECKER: default
+      SW_TELEMETRY: prometheus
+      JAVA_OPTS: "-Xms2048m -Xmx2048m"
+    networks:
+      - skywalking-network
+
+  skywalking-ui:
+    image: ${UI_IMAGE}
+    container_name: skywalking-ui
+    depends_on:
+      - skywalking-oap
+    links:
+      - skywalking-oap
+    ports:
+      - "8080:8080"
+    environment:
+      SW_OAP_ADDRESS: http://oap:12800
+      SW_ZIPKIN_ADDRESS: http://oap:9412
+    networks:
+      - skywalking-network
+
+  mysql:
+    image: ${MYSQL_IMAGE}
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docker/mysql/mysql.cnf:/etc/mysql/conf.d/mysql.cnf:ro
+      - ./data/mysql:/var/lib/mysql/:rw
+    restart: always
+    networks:
+      - skywalking-network
+    environment:
+      MYSQL_DATABASE: skywalking
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      TZ: "$TZ"
+
+networks:
+  skywalking-network:
