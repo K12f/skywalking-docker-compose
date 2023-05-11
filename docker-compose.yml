@@ -23,6 +23,10 @@ services:
       SW_HEALTH_CHECKER: default
       SW_TELEMETRY: prometheus
       JAVA_OPTS: "-Xms2048m -Xmx2048m"
+      TZ: "$TZ"
+    volumes:
+      - ./docker/skywalking/oap-libs/mysql-connector-java-8.0.25.jar:/skywalking/oap-libs/
+    restart: always
     networks:
       - skywalking-network
 
@@ -34,10 +38,11 @@ services:
     links:
       - skywalking-oap
     ports:
-      - "8080:8080"
+      - "8899:8899"
     environment:
       SW_OAP_ADDRESS: http://oap:12800
       SW_ZIPKIN_ADDRESS: http://oap:9412
+      TZ: "$TZ"
     networks:
       - skywalking-network
 
