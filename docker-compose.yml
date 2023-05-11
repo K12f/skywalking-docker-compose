@@ -17,7 +17,7 @@ services:
       start_period: 10s
     environment:
       SW_STORAGE: mysql
-      SW_STORAGE_MYSQL_URL: jdbc:mysql://mysql:3306/skywalking
+      SW_STORAGE_MYSQL_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
       SW_STORAGE_MYSQL_USERNAME: ${MYSQL_USER}
       SW_STORAGE_MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       SW_HEALTH_CHECKER: default
@@ -53,7 +53,7 @@ services:
     networks:
       - skywalking-network
     environment:
-      MYSQL_DATABASE: skywalking
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
