@@ -43,6 +43,7 @@ services:
       SW_OAP_ADDRESS: http://skywalking-oap:12800
       SW_ZIPKIN_ADDRESS: http://skywalking-oap:9412
       TZ: "$TZ"
+      security.user.myusername.password: admin
     networks:
       - skywalking-network
 
