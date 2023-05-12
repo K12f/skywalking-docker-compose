@@ -17,15 +17,15 @@ services:
       start_period: 10s
     environment:
       SW_STORAGE: mysql
-      SW_STORAGE_MYSQL_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
-      SW_STORAGE_MYSQL_USERNAME: ${MYSQL_USER}
-      SW_STORAGE_MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      SW_JDBC_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
+      SW_DATA_SOURCE_USER: ${MYSQL_USER}
+      SW_DATA_SOURCE_PASSWORD: ${MYSQL_PASSWORD}
       SW_HEALTH_CHECKER: default
       SW_TELEMETRY: prometheus
       JAVA_OPTS: "-Xms2048m -Xmx2048m"
       TZ: "$TZ"
     volumes:
-      - ./docker/skywalking/oap-libs/mysql-connector-java-8.0.25.jar:/skywalking/oap-libs/
+      - ./docker/skywalking/oap-libs/mysql-connector-java-8.0.25.jar:/skywalking/oap-libs/mysql-connector-java-8.0.25.jar
     restart: always
     networks:
       - skywalking-network
@@ -38,10 +38,10 @@ services:
     links:
       - skywalking-oap
     ports:
-      - "8899:8899"
+      - "8899:8080"
     environment:
-      SW_OAP_ADDRESS: http://oap:12800
-      SW_ZIPKIN_ADDRESS: http://oap:9412
+      SW_OAP_ADDRESS: http://skywalking-oap:12800
+      SW_ZIPKIN_ADDRESS: http://skywalking-oap:9412
       TZ: "$TZ"
     networks:
       - skywalking-network
