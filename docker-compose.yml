@@ -21,6 +21,7 @@ services:
       SW_DATA_SOURCE_USER: ${MYSQL_USER}
       SW_DATA_SOURCE_PASSWORD: ${MYSQL_PASSWORD}
       SW_HEALTH_CHECKER: default
+      SW_OTEL_RECEIVER: default
       SW_TELEMETRY: prometheus
       JAVA_OPTS: "-Xms2048m -Xmx2048m"
       TZ: "$TZ"
@@ -64,6 +65,29 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       TZ: "$TZ"
+
+  mysqld-exporter:
+    image: prom/mysqld-exporter:latest
+    container_name: mysqld-exporter
+    ports:
+      - 9104:9104
+    networks:
+      - skywalking-network
+    environment:
+      - DATA_SOURCE_NAME=mysql_exporter:mysql_exporter@(mysql:3306)/
+      - TZ="$TZ"
+
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    container_name: otel-collector
+    command: [ "--config=/etc/otel-collector-config.yaml" ]
+    volumes:
+      - ./docker/otel-collector/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    depends_on:
+      skywalking-oap:
+        condition: service_healthy
+    networks:
+      skywalking-network:
 
 networks:
   skywalking-network:
